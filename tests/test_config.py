@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import pytest
 
+import trending_monitor.config as config_module
 from trending_monitor.config import load_settings
 
 
 def test_load_settings_reads_env_values(monkeypatch) -> None:
     """配置加载器应能读取环境变量并转换为结构化配置。"""
 
+    monkeypatch.setattr(config_module, "load_dotenv", lambda: None)
     monkeypatch.setenv("TRENDING_URL", "https://github.com/trending")
     monkeypatch.setenv("FETCH_TIMEOUT", "20")
     monkeypatch.setenv("TOP_N", "10")
@@ -34,6 +36,7 @@ def test_load_settings_reads_env_values(monkeypatch) -> None:
 def test_load_settings_raises_error_when_required_env_missing(monkeypatch) -> None:
     """缺失必要配置时应抛出中文错误，帮助快速定位问题。"""
 
+    monkeypatch.setattr(config_module, "load_dotenv", lambda: None)
     for key in (
         "TRENDING_URL",
         "FETCH_TIMEOUT",

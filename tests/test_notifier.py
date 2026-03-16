@@ -91,3 +91,50 @@ def test_send_email_uses_smtp_configuration(monkeypatch) -> None:
         ("login", ("sender@example.com", "secret-token")),
         ("sendmail", ("sender@example.com", ["receiver@example.com"])),
     ]
+
+
+def test_send_email_uses_ssl_client_for_port_465(monkeypatch) -> None:
+    """当配置为 SSL 模式时，应使用 SMTP_SSL 而不是普通 SMTP。"""
+
+    actions: list[tuple[str, object]] = []
+
+    class FakeSMTPSSL:
+        def __init__(self, host: str, port: int, timeout: int) -> None:
+            actions.append(("init_ssl", (host, port, timeout)))
+
+        def __enter__(self) -> "FakeSMTPSSL":
+            return self
+
+        def __exit__(self, exc_type, exc, tb) -> None:
+            return None
+
+        def login(self, username: str, password: str) -> None:
+            actions.append(("login", (username, password)))
+
+        def sendmail(self, from_email: str, to_emails: list[str], message: str) -> None:
+            actions.append(("sendmail", (from_email, to_emails)))
+            assert "Subject:" in message
+
+    def fail_if_plain_smtp(*args, **kwargs):
+        raise AssertionError("SSL 模式不应该使用普通 SMTP")
+
+    monkeypatch.setattr(smtplib, "SMTP_SSL", FakeSMTPSSL)
+    monkeypatch.setattr(smtplib, "SMTP", fail_if_plain_smtp)
+
+    smtp_config = SmtpConfig(
+        host="smtp.example.com",
+        port=465,
+        username="sender@example.com",
+        password="secret-token",
+        from_email="sender@example.com",
+        to_email="receiver@example.com",
+        use_tls=False,
+    )
+
+    send_email("测试主题", "<html>body</html>", smtp_config)
+
+    assert actions == [
+        ("init_ssl", ("smtp.example.com", 465, 30)),
+        ("login", ("sender@example.com", "secret-token")),
+        ("sendmail", ("sender@example.com", ["receiver@example.com"])),
+    ]

@@ -62,9 +62,12 @@ def send_email(subject: str, html: str, smtp_config: SmtpConfig) -> None:
     message.attach(MIMEText(html, "html", "utf-8"))
 
     try:
-        # 大多数邮箱服务使用授权码而不是登录密码，这里统一走 TLS 更安全。
-        with smtplib.SMTP(smtp_config.host, smtp_config.port, timeout=30) as server:
-            if smtp_config.use_tls:
+        # 465 通常表示隐式 SSL，需要直接建立加密连接；
+        # 587 则更常见于普通 SMTP + STARTTLS 升级连接。
+        smtp_client = smtplib.SMTP_SSL if smtp_config.port == 465 else smtplib.SMTP
+        with smtp_client(smtp_config.host, smtp_config.port, timeout=30) as server:
+            # 大多数邮箱服务使用授权码而不是登录密码。
+            if smtp_config.port != 465 and smtp_config.use_tls:
                 server.starttls()
             server.login(smtp_config.username, smtp_config.password)
             server.sendmail(

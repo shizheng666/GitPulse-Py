@@ -64,13 +64,18 @@ FETCH_TIMEOUT=15
 TOP_N=20
 DATA_DIR=data
 SMTP_HOST=smtp.qq.com
-SMTP_PORT=587
+SMTP_PORT=465
 SMTP_USERNAME=your_email@qq.com
 SMTP_PASSWORD=your_authorization_code
 FROM_EMAIL=your_email@qq.com
 TO_EMAIL=receiver@example.com
-SMTP_USE_TLS=true
+SMTP_USE_TLS=false
 ```
+
+如果你的邮箱使用：
+
+- `465`：这是 SSL 模式，程序会自动走 `SMTP_SSL`
+- `587`：这是 `STARTTLS` 模式，`SMTP_USE_TLS` 保持 `true`
 
 ## 本地运行
 
@@ -120,6 +125,11 @@ GitHub Trending 是网页抓取，不是官方稳定 API。如果页面结构变
 ### 2. 邮箱账号密码正确，但仍然发送失败
 
 很多邮箱要求使用“SMTP 授权码”，而不是网页登录密码。请到邮箱后台开启 SMTP 服务并生成授权码。
+
+另外也要确认端口和加密方式是否匹配：
+
+- `465` 对应 SSL
+- `587` 对应 STARTTLS
 
 ### 3. 网络超时或访问失败
 
