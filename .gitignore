@@ -1,0 +1,15 @@
+# Python 缓存目录
+__pycache__/
+*.pyc
+
+# 测试与工具缓存
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# 本地虚拟环境
+.venv/
+
+# 本地运行配置与输出
+.env
+data/
