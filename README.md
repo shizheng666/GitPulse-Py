@@ -2,6 +2,9 @@
 
 这是一个面向 Python 学习的自动化小项目：每天抓取 GitHub Trending 热门项目，提取关键信息，保存为本地 JSON，并通过邮件发送一份日报。
 
+# 执行
+uv run python main.py 
+
 ## 功能列表
 
 - 抓取 GitHub Trending 日榜全站项目
@@ -82,13 +85,16 @@ SMTP_USE_TLS=false
 使用 `uv` 直接运行：
 
 ```powershell
-uv run --with beautifulsoup4 --with python-dotenv python main.py
+uv run python main.py
 ```
 
 运行成功后会：
 
+- 在交互式终端中显示 5 个阶段的中文进度条
 - 在 `data/` 目录生成 `trending_YYYY-MM-DD.json`
 - 向目标邮箱发送一封“GitHub 今日热门项目日报”
+
+如果脚本运行在 Windows 任务计划程序、日志重定向或其他非交互环境中，会自动降级为普通中文步骤日志，避免输出动态控制字符。
 
 ## 运行测试
 
@@ -107,7 +113,7 @@ uv run --with pytest --with beautifulsoup4 --with python-dotenv pytest -q
 7. 参数填写：
 
 ```text
-run --with beautifulsoup4 --with python-dotenv python C:\Users\admin\Desktop\study\py\main.py
+run python C:\Users\admin\Desktop\study\py\main.py
 ```
 
 8. 起始于填写项目目录：
@@ -138,3 +144,4 @@ GitHub Trending 是网页抓取，不是官方稳定 API。如果页面结构变
 ### 4. 为什么要保存本地 JSON
 
 本地快照除了方便调试，还能为后续扩展“只提醒新上榜项目”提供数据基础。
+
